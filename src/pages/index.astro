@@ -1,0 +1,647 @@
+---
+---
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Divina — Mi Luna</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@500;700&family=Cinzel:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --gold:      #d4a853;
+      --soft-gold: #f0d080;
+      --cream:     #fdf6e3;
+      --night:     #04060f;
+    }
+
+    html { font-size:16px; }
+    body {
+      min-height:100dvh; width:100%;
+      background:var(--night);
+      font-family:'Cormorant Garamond',serif;
+      overflow-x:hidden;
+    }
+
+    /* ══════════════════════════════════════════
+       INTRO
+    ══════════════════════════════════════════ */
+    #intro {
+      position:fixed; inset:0; z-index:200;
+      background:#000;
+      overflow:hidden;
+    }
+
+    #intro-canvas { position:absolute; inset:0; }
+
+    /* ── Luna intro ── */
+    #intro-moon {
+      position:absolute;
+      width:  clamp(90px,16vw,160px);
+      height: clamp(90px,16vw,160px);
+      border-radius:50%;
+      /* posición horizontal: 55% para que quede ligeramente a la derecha del chico */
+      left:55%; transform:translateX(-50%);
+      bottom:-240px;
+      background:radial-gradient(circle at 38% 32%,#fffde8,#f7e4a8 42%,#c8942a 82%,#7a4a08);
+      box-shadow:
+        0 0 50px 22px rgba(245,218,120,.28),
+        0 0 130px 60px rgba(200,148,42,.14),
+        0 0 220px 100px rgba(200,148,42,.06);
+      animation:moonRise 3.6s cubic-bezier(.22,.61,.36,1) 1s forwards;
+      z-index:2;
+    }
+    #intro-moon::after {
+      content:''; position:absolute; inset:0; border-radius:50%;
+      background:radial-gradient(circle at 28% 24%,rgba(255,255,255,.20) 0%,transparent 52%);
+    }
+    @keyframes moonRise {
+      0%   { bottom:-240px;
+             box-shadow:0 0 20px 8px rgba(245,218,120,.08); }
+      100% { bottom:48vh;
+             box-shadow:0 0 60px 26px rgba(245,218,120,.30),
+                        0 0 150px 70px rgba(200,148,42,.15),
+                        0 0 260px 110px rgba(200,148,42,.07); }
+    }
+
+    /* ── Columna de luz que desciende de la luna ── */
+    #light-beam {
+      position:absolute;
+      left:55%; transform:translateX(-50%);
+      top:0; bottom:0;
+      width:clamp(120px,28vw,320px);
+      background:linear-gradient(180deg,
+        transparent 0%,
+        rgba(245,218,100,.00) 35%,
+        rgba(245,218,100,.05) 60%,
+        rgba(245,218,100,.02) 100%);
+      opacity:0;
+      z-index:1;
+      animation:beamAppear 2s ease 4s forwards;
+    }
+    @keyframes beamAppear { to { opacity:1; } }
+
+    /* Halo de suelo */
+    #ground-glow {
+      position:absolute; bottom:0; z-index:2;
+      left:55%; transform:translateX(-50%);
+      width:0; height:70px; border-radius:50%; opacity:0;
+      background:radial-gradient(ellipse,rgba(245,218,100,.16),transparent 68%);
+      animation:glowExpand 2.6s ease 4s forwards;
+    }
+    @keyframes glowExpand { to { width:min(540px,80vw); opacity:1; } }
+
+    /* ── Silueta ── */
+    #sil-wrap {
+      position:absolute; z-index:4;
+      bottom:0;
+      left:calc(55% - clamp(110px,20vw,190px));
+      /* el chico está a la izquierda de la luna */
+      display:flex; flex-direction:column; align-items:center;
+      opacity:0;
+      animation:fadeIn .8s ease .6s forwards;
+    }
+
+    #sil-wrap svg {
+      width:  clamp(70px,12vw,110px);
+      height: auto;
+      display:block;
+      /* sombra de luna hacia abajo */
+      filter:drop-shadow(0 0 8px rgba(245,218,100,.12));
+    }
+
+    /* suelo bajo el chico */
+    #sil-wrap::after {
+      content:'';
+      width:clamp(60px,10vw,90px); height:4px; border-radius:50%;
+      background:radial-gradient(ellipse,rgba(245,218,100,.18),transparent 70%);
+      display:block; margin-top:-2px;
+    }
+
+    /* ── Textos intro ── */
+    .intro-line {
+      position:absolute; z-index:10;
+      width:min(480px,85vw); text-align:center;
+      left:50%; transform:translateX(-50%);
+      font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:300;
+      font-size:clamp(.88rem,2.2vw,1.25rem);
+      letter-spacing:.05em; line-height:2;
+      color:rgba(245,235,200,0);
+      animation:textReveal 1.1s ease forwards;
+    }
+    .intro-line:nth-child(1){ top:10%; animation-delay:.5s; }
+    .intro-line:nth-child(2){ top:calc(10% + clamp(1.6rem,3.5vw,2.5rem)); animation-delay:1.6s; }
+    .intro-line:nth-child(3){ top:calc(10% + clamp(3.2rem,7vw,5rem)); animation-delay:5.6s; }
+    @keyframes textReveal { to { color:rgba(245,235,200,.80); } }
+
+    /* ── Nombre intro ── */
+    #intro-name {
+      position:absolute; z-index:20;
+      bottom:clamp(18px,5vh,56px);
+      left:50%; transform:translateX(-50%);
+      font-family:'Cinzel',serif; font-weight:300;
+      font-size:clamp(2rem,9vw,5rem);
+      letter-spacing:.42em; white-space:nowrap;
+      color:transparent;
+      background:linear-gradient(135deg,#b87820,#f5e090,#c8942a);
+      -webkit-background-clip:text; background-clip:text;
+      filter:drop-shadow(0 0 22px rgba(245,218,100,.55));
+      opacity:0;
+      animation:nameAppear 2s ease 6.4s forwards;
+    }
+    @keyframes nameAppear {
+      from{ opacity:0; letter-spacing:.72em; filter:drop-shadow(0 0 60px rgba(245,218,100,.9)); }
+      to  { opacity:1; letter-spacing:.42em; filter:drop-shadow(0 0 22px rgba(245,218,100,.50)); }
+    }
+
+    #intro.out { animation:fadeOut 1.5s ease forwards; pointer-events:none; }
+    @keyframes fadeOut { to { opacity:0; } }
+
+    /* ══════════════════════════════════════════
+       FONDO PERMANENTE
+    ══════════════════════════════════════════ */
+    #bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+    .nebula {
+      position:fixed; border-radius:50%;
+      filter:blur(100px); opacity:.07; pointer-events:none; z-index:0;
+    }
+    .neb-a {
+      width:min(60vw,500px); height:min(60vw,500px);
+      background:radial-gradient(circle,#5a2e90,transparent);
+      top:-15%; left:-15%;
+      animation:drift 22s ease-in-out infinite alternate;
+    }
+    .neb-b {
+      width:min(50vw,420px); height:min(50vw,420px);
+      background:radial-gradient(circle,#124466,transparent);
+      bottom:-15%; right:-10%;
+      animation:drift 28s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes drift { to { transform:translate(6%,6%) scale(1.1); } }
+
+    /* ══════════════════════════════════════════
+       MAIN
+    ══════════════════════════════════════════ */
+    #main {
+      position:relative; z-index:10;
+      opacity:0; transition:opacity 1.4s ease;
+      min-height:100dvh;
+    }
+    #main.show { opacity:1; }
+
+    /* Luna decorativa */
+    .deco-moon {
+      position:fixed;
+      top:clamp(10px,2.5vh,26px);
+      right:clamp(10px,3.5vw,36px);
+      width:clamp(52px,8.5vw,115px);
+      height:clamp(52px,8.5vw,115px);
+      border-radius:50%;
+      background:radial-gradient(circle at 35% 30%,#fffde8,#f7e4a8 44%,#c8942a 84%,#7a4a08);
+      box-shadow:
+        0 0 36px 14px rgba(245,218,120,.22),
+        0 0 90px 40px rgba(200,148,42,.10);
+      animation:moonFloat 7s ease-in-out infinite;
+      z-index:5;
+    }
+    .deco-moon::after {
+      content:''; position:absolute; inset:0; border-radius:50%;
+      background:radial-gradient(circle at 28% 24%,rgba(255,255,255,.16) 0%,transparent 54%);
+    }
+    @keyframes moonFloat {
+      0%,100%{ transform:translateY(0) rotate(-2deg); }
+      50%    { transform:translateY(-10px) rotate(2deg); }
+    }
+
+    /* ── Layout ── */
+    .page-wrap {
+      min-height:100dvh;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      padding:clamp(14px,3.5vw,44px);
+      padding-top:clamp(18px,4.5vh,48px);
+      gap:clamp(18px,2.8vh,32px);
+    }
+
+    /* ── Header ── */
+    .header {
+      text-align:center;
+      display:flex; flex-direction:column; align-items:center; gap:.55rem;
+    }
+    .header-name {
+      font-family:'Cinzel',serif; font-weight:300;
+      font-size:clamp(1.8rem,6.5vw,4.6rem);
+      letter-spacing:.34em;
+      color:transparent;
+      background:linear-gradient(135deg,#b87820,#f5e090,#d4a853);
+      -webkit-background-clip:text; background-clip:text;
+      filter:drop-shadow(0 0 16px rgba(245,218,100,.44));
+      animation:nameGlow 3.5s ease-in-out infinite alternate;
+    }
+    @keyframes nameGlow {
+      from { filter:drop-shadow(0 0 10px rgba(245,218,100,.28)); }
+      to   { filter:drop-shadow(0 0 28px rgba(245,218,100,.72)); }
+    }
+    .header-sub {
+      font-family:'Dancing Script',cursive; font-weight:500;
+      font-size:clamp(.82rem,2vw,1.2rem);
+      color:rgba(240,208,128,.58);
+      letter-spacing:.10em;
+    }
+    .gold-line {
+      width:clamp(50px,18vw,140px); height:1px;
+      background:linear-gradient(90deg,transparent,rgba(212,168,83,.65),transparent);
+      margin:.15rem 0;
+    }
+
+    /* ── Centro ── */
+    .center {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      align-items:center;
+      gap:clamp(18px,4vw,56px);
+    }
+    @media(max-width:660px){
+      .center{ grid-template-columns:1fr; justify-items:center; }
+    }
+
+    /* Foto */
+    .photo-col {
+      display:flex; flex-direction:column; align-items:center; gap:.9rem;
+    }
+    .photo-wrapper {
+      position:relative;
+      animation:floatY 5.5s ease-in-out infinite;
+    }
+    @keyframes floatY {
+      0%,100%{ transform:translateY(0); }
+      50%    { transform:translateY(-11px); }
+    }
+    .ring {
+      position:absolute; border-radius:50%; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      border:1px solid rgba(212,168,83,.26);
+      animation:spin var(--s) linear infinite;
+    }
+    .ring::after {
+      content:''; position:absolute;
+      width:clamp(5px,.9vw,8px); height:clamp(5px,.9vw,8px);
+      border-radius:50%;
+      background:var(--gold);
+      box-shadow:0 0 7px 3px rgba(212,168,83,.65);
+      top:var(--dt,calc(50% - 4px)); left:var(--dl,-4px);
+    }
+    @keyframes spin { to { transform:translate(-50%,-50%) rotate(360deg); } }
+
+    .photo-img {
+      display:block;
+      width:clamp(155px,36vw,270px);
+      height:clamp(155px,36vw,270px);
+      border-radius:50%; object-fit:cover;
+      border:3px solid rgba(212,168,83,.78);
+      box-shadow:
+        0 0 0 7px rgba(212,168,83,.07),
+        0 0 46px 13px rgba(212,168,83,.20),
+        0 0 95px 28px rgba(245,218,120,.09);
+      filter:brightness(.94) saturate(.86) sepia(.07);
+      position:relative; z-index:1;
+    }
+    .photo-caption {
+      font-family:'Dancing Script',cursive;
+      font-size:clamp(.8rem,1.7vw,1.05rem);
+      color:rgba(240,208,128,.50);
+      letter-spacing:.07em; text-align:center;
+    }
+
+    /* Poema */
+    .poem-col {
+      display:flex; flex-direction:column; gap:clamp(.7rem,1.8vh,1.3rem);
+    }
+    .poem-title {
+      font-family:'Dancing Script',cursive; font-weight:700;
+      font-size:clamp(1.25rem,3vw,2.1rem);
+      color:var(--soft-gold);
+      text-shadow:0 0 18px rgba(240,208,128,.42),0 0 55px rgba(240,208,128,.16);
+      line-height:1.28;
+      animation:titlePulse 4s ease-in-out infinite;
+    }
+    @keyframes titlePulse {
+      0%,100%{ text-shadow:0 0 18px rgba(240,208,128,.42),0 0 55px rgba(240,208,128,.16); }
+      50%    { text-shadow:0 0 30px rgba(240,208,128,.70),0 0 85px rgba(240,208,128,.30); }
+    }
+    .verse {
+      font-size:clamp(.86rem,1.55vw,1.08rem);
+      font-style:italic; font-weight:300;
+      line-height:1.95;
+      color:rgba(253,246,227,.74);
+      letter-spacing:.02em;
+    }
+    .verse em { font-style:normal; color:var(--soft-gold); }
+    .signature {
+      font-family:'Dancing Script',cursive;
+      font-size:clamp(.9rem,1.7vw,1.15rem);
+      color:rgba(168,152,128,.72);
+      padding-top:.2rem;
+    }
+
+    /* ── Footer ── */
+    .footer-stars {
+      text-align:center;
+      font-size:clamp(.7rem,1.3vw,.9rem);
+      color:rgba(212,168,83,.32);
+      letter-spacing:.2em;
+      padding-bottom:clamp(6px,1.5vh,18px);
+    }
+
+    /* ── Sparkles ── */
+    .sparkle {
+      position:fixed; width:3px; height:3px; border-radius:50%;
+      background:var(--soft-gold);
+      box-shadow:0 0 5px 2px rgba(240,208,128,.48);
+      pointer-events:none; z-index:4;
+      animation:sparkleUp var(--d) ease-in-out var(--dl) infinite;
+    }
+    @keyframes sparkleUp {
+      0%  { opacity:0; transform:translateY(0) scale(0); }
+      20% { opacity:1; transform:translateY(-16px) scale(1); }
+      80% { opacity:.45; transform:translateY(-72px) scale(.5); }
+      100%{ opacity:0; transform:translateY(-110px) scale(0); }
+    }
+
+    @keyframes fadeIn { to { opacity:1; } }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     INTRO
+══════════════════════════════════════════ -->
+<div id="intro">
+  <canvas id="intro-canvas"></canvas>
+
+  <p class="intro-line">Había una vez un chico en la oscuridad.</p>
+  <p class="intro-line">No le molestaba… hasta que vio la luna.</p>
+  <p class="intro-line">Y la luna se llamaba…</p>
+
+  <div id="light-beam"></div>
+  <div id="ground-glow"></div>
+  <div id="intro-moon"></div>
+
+  <!-- Silueta mejorada -->
+  <div id="sil-wrap">
+    <svg viewBox="0 0 110 240" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- Gradiente del rim-light lunar (ilumina el lado derecho/arriba) -->
+        <linearGradient id="rimH" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%"   stop-color="rgba(245,215,100,0.00)"/>
+          <stop offset="100%" stop-color="rgba(245,215,100,0.22)"/>
+        </linearGradient>
+        <linearGradient id="rimV" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%"   stop-color="rgba(245,215,100,0.00)"/>
+          <stop offset="100%" stop-color="rgba(245,215,100,0.25)"/>
+        </linearGradient>
+      </defs>
+
+      <!-- ── CUERPO: relleno oscuro bloqueando las estrellas ── -->
+
+      <!-- Cabeza: ligeramente echada hacia atrás (mirando la luna) -->
+      <ellipse cx="56" cy="22" rx="15" ry="17" fill="#0b0d1a"/>
+      <!-- Cara/frente: lado que recibe la luna-light -->
+      <ellipse cx="64" cy="18" rx="9"  ry="11" fill="#0e1020" opacity=".8"/>
+
+      <!-- Cuello -->
+      <rect x="49" y="37" width="13" height="14" rx="2" fill="#0b0d1a"/>
+
+      <!-- Torso + hombros -->
+      <path d="M14 54 Q18 50 56 49 Q78 50 96 54
+               L92 124 Q74 132 56 131 Q38 132 18 124 Z"
+            fill="#0b0d1a"/>
+
+      <!-- Brazo izquierdo: levantado, señalando/admirando la luna -->
+      <path d="M18 60 Q2 40 0 18"
+            stroke="#0b0d1a" stroke-width="13" stroke-linecap="round" fill="none"/>
+      <!-- Mano izq -->
+      <circle cx="1" cy="15" r="6" fill="#0b0d1a"/>
+
+      <!-- Brazo derecho: relajado, ligeramente caído -->
+      <path d="M93 62 Q106 86 103 108"
+            stroke="#0b0d1a" stroke-width="13" stroke-linecap="round" fill="none"/>
+
+      <!-- Pierna izquierda -->
+      <path d="M42 131 Q36 175 32 236"
+            stroke="#0b0d1a" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <!-- Pie izq -->
+      <ellipse cx="30" cy="237" rx="12" ry="5" fill="#0b0d1a"/>
+
+      <!-- Pierna derecha -->
+      <path d="M68 131 Q74 175 78 236"
+            stroke="#0b0d1a" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <!-- Pie der -->
+      <ellipse cx="80" cy="237" rx="12" ry="5" fill="#0b0d1a"/>
+
+      <!-- ── RIM-LIGHT: bordes iluminados por la luna (lado derecho/arriba) ── -->
+
+      <!-- Borde cabeza (lado luna) -->
+      <ellipse cx="56" cy="22" rx="15" ry="17"
+               fill="none" stroke="rgba(245,215,100,0.30)" stroke-width="1.2"
+               stroke-dasharray="28 60" stroke-dashoffset="0"/>
+
+      <!-- Hombro derecho rimlight -->
+      <path d="M75 50 Q90 52 96 54"
+            stroke="rgba(245,215,100,0.22)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+
+      <!-- Torso lado derecho -->
+      <path d="M96 54 L92 124"
+            stroke="rgba(245,215,100,0.14)" stroke-width="1" fill="none"/>
+
+      <!-- Brazo izquierdo rimlight (más iluminado por ser el que señala la luna) -->
+      <path d="M18 60 Q2 40 0 18"
+            stroke="rgba(245,215,100,0.32)" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+
+      <!-- Top de la cabeza: el punto más iluminado -->
+      <ellipse cx="54" cy="8" rx="10" ry="4"
+               fill="rgba(245,215,100,0.08)"/>
+
+      <!-- Destello suave en el hombro izquierdo -->
+      <ellipse cx="20" cy="55" rx="8" ry="5"
+               fill="rgba(245,215,100,0.06)" transform="rotate(-15 20 55)"/>
+    </svg>
+  </div>
+
+  <div id="intro-name">DIVINA</div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     FONDO PERMANENTE
+══════════════════════════════════════════ -->
+<canvas id="bg-canvas"></canvas>
+<div class="nebula neb-a"></div>
+<div class="nebula neb-b"></div>
+<div class="deco-moon"></div>
+<div id="sparkles"></div>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<div id="main">
+  <div class="page-wrap">
+
+    <header class="header">
+      <div class="gold-line"></div>
+      <h1 class="header-name">DIVINA</h1>
+      <p class="header-sub">la chica que llega y lo cambia todo sin darse cuenta</p>
+      <div class="gold-line"></div>
+    </header>
+
+    <div class="center">
+
+      <!-- Foto -->
+      <div class="photo-col">
+        <div class="photo-wrapper" id="photoWrap">
+          <img class="photo-img" src="/image.png" alt="Divina" id="photoImg" />
+        </div>
+        <p class="photo-caption">ella y su gatito ✦</p>
+      </div>
+
+      <!-- Poema — tono casual, sin pasarse -->
+      <div class="poem-col">
+        <p class="poem-title">
+          Hay personas que llegan<br/>
+          y hacen todo diferente
+        </p>
+
+        <div class="gold-line"></div>
+
+        <p class="verse">
+          No sé bien cómo explicarlo.<br/>
+          Pero desde que apareciste<br/>
+          hay algo en el ambiente<br/>
+          <em>que se siente distinto.</em>
+        </p>
+
+        <p class="verse">
+          Eres de esas personas que brillan<br/>
+          sin ponerse a intentarlo,<br/>
+          que hacen sonreír a la gente<br/>
+          <em>sin saber que lo están haciendo.</em>
+        </p>
+
+        <p class="verse">
+          Como la luna:<br/>
+          no pide que la veas,<br/>
+          pero igual la ves.<br/>
+          <em>Y cuando la ves, ya no puedes ignorarla.</em>
+        </p>
+
+        <div class="gold-line"></div>
+        <p class="signature">Me alegra estar conociéndote ✦</p>
+      </div>
+
+    </div>
+
+    <footer class="footer-stars">✦ &nbsp; ✦ &nbsp; ✦</footer>
+  </div>
+</div>
+
+<script>
+/* ── Intro stars ─────────────────────────────────── */
+(function(){
+  const c=document.getElementById('intro-canvas'), ctx=c.getContext('2d');
+  let W,H,stars=[];
+  const resize=()=>{W=c.width=innerWidth;H=c.height=innerHeight;};
+  const mk=()=>({x:Math.random()*W,y:Math.random()*H*.78,r:Math.random()*1.3+.2,
+                 speed:Math.random()*.006+.002,phase:Math.random()*Math.PI*2});
+  const init=()=>{stars=Array.from({length:190},mk);};
+  const draw=t=>{
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      const a=.18+.82*(.5+.5*Math.sin(s.phase+t*s.speed));
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,245,210,${a})`; ctx.fill();
+    }
+  };
+  const loop=ts=>{draw(ts*.001);requestAnimationFrame(loop);};
+  resize();init();requestAnimationFrame(loop);
+  addEventListener('resize',()=>{resize();init();});
+})();
+
+/* ── Transición intro → main ─────────────────────── */
+setTimeout(()=>{
+  document.getElementById('intro').classList.add('out');
+  setTimeout(()=>document.getElementById('intro').remove(),1500);
+  document.getElementById('main').classList.add('show');
+},10000);
+
+/* ── Anillos dinámicos ───────────────────────────── */
+(function(){
+  const img=document.getElementById('photoImg');
+  const wrap=document.getElementById('photoWrap');
+  function build(){
+    wrap.querySelectorAll('.ring').forEach(r=>r.remove());
+    const sz=img.offsetWidth;
+    [{e:22,s:'14s',dt:'calc(50% - 4px)',dl:'-4px'},
+     {e:46,s:'23s',dt:'-4px',dl:'calc(50% - 4px)',rev:true}].forEach(cfg=>{
+      const d=document.createElement('div');
+      const side=sz+cfg.e;
+      d.className='ring';
+      d.style.cssText=`width:${side}px;height:${side}px;--s:${cfg.s};--dt:${cfg.dt};--dl:${cfg.dl};${cfg.rev?'animation-direction:reverse;':''}`;
+      wrap.insertBefore(d,img);
+    });
+  }
+  if(img.complete) build(); else img.onload=build;
+  addEventListener('resize',build);
+})();
+
+/* ── Background stars ────────────────────────────── */
+(function(){
+  const c=document.getElementById('bg-canvas'), ctx=c.getContext('2d');
+  let W,H,stars=[];
+  const resize=()=>{W=c.width=innerWidth;H=c.height=innerHeight;};
+  const mk=()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.2,
+                 speed:Math.random()*.007+.002,phase:Math.random()*Math.PI*2});
+  const init=()=>{stars=Array.from({length:260},mk);};
+  const draw=t=>{
+    ctx.clearRect(0,0,W,H);
+    for(const s of stars){
+      const a=.18+.82*(.5+.5*Math.sin(s.phase+t*s.speed));
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,245,220,${a})`; ctx.fill();
+    }
+  };
+  const loop=ts=>{draw(ts*.001);requestAnimationFrame(loop);};
+  resize();init();requestAnimationFrame(loop);
+  addEventListener('resize',()=>{resize();init();});
+})();
+
+/* ── Sparkles ────────────────────────────────────── */
+(function(){
+  const cont=document.getElementById('sparkles');
+  for(let i=0;i<36;i++){
+    const el=document.createElement('div');
+    el.className='sparkle';
+    el.style.cssText=`left:${Math.random()*100}%;top:${10+Math.random()*80}%;--d:${3+Math.random()*5}s;--dl:${Math.random()*7}s;`;
+    cont.appendChild(el);
+  }
+})();
+
+/* ── Estrellas fugaces ───────────────────────────── */
+function shoot(){
+  const el=document.createElement('div');
+  const len=90+Math.random()*110, ang=26+Math.random()*20;
+  el.style.cssText=`position:fixed;left:${Math.random()*innerWidth*.7}px;top:${Math.random()*innerHeight*.42}px;width:${len}px;height:1.5px;background:linear-gradient(90deg,rgba(255,248,200,.88),transparent);border-radius:2px;transform:rotate(${ang}deg);transform-origin:left center;opacity:0;z-index:6;pointer-events:none;`;
+  document.body.appendChild(el);
+  el.animate([
+    {opacity:0,transform:`rotate(${ang}deg) translateX(0)`},
+    {opacity:1,transform:`rotate(${ang}deg) translateX(18px)`},
+    {opacity:0,transform:`rotate(${ang}deg) translateX(${len*1.6}px)`},
+  ],{duration:820,easing:'ease-in'}).onfinish=()=>el.remove();
+}
+setTimeout(shoot,2200);
+setInterval(shoot,4800);
+</script>
+</body>
+</html>
